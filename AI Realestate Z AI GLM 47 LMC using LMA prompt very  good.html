@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Applied AI Labs - Realtors AI Advantage</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .brand-font { font-family: 'Playfair Display', serif; }
+        .sidebar-link.active { background-color: rgba(251, 191, 36, 0.1); border-left: 4px solid #F59E0B; color: #F59E0B; }
+        .gold-accent { color: #D97706; }
+        .bg-luxury { background-color: #0F172A; }
+        .text-luxury { color: #F8FAFC; }
+        .typing-cursor::after { content: '|'; animation: blink 1s step-start infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .toast {
+            position: fixed; bottom: 20px; right: 20px;
+            background: #333; color: white; padding: 12px 24px;
+            border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transform: translateY(100px); transition: transform 0.3s ease-out;
+            z-index: 50;
+        }
+        .toast.show { transform: translateY(0); }
+    </style>
+</head>
+<body class="bg-gray-50 text-slate-800 antialiased h-screen flex overflow-hidden">
+
+    <!-- Sidebar Navigation -->
+    <aside class="w-64 bg-slate-900 text-white flex flex-col flex-shrink-0 transition-all duration-300 hidden md:flex">
+        <div class="p-6 border-b border-slate-700">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-amber-500 rounded-lg flex items-center justify-center text-slate-900 font-bold text-xl">
+                    <i class="fa-solid fa-brain"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight brand-font tracking-wide">Applied AI Labs</h1>
+                    <p class="text-xs text-slate-400">Realtors Advantage</p>
+                </div>
+            </div>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto py-4">
+            <ul class="space-y-1" id="nav-list">
+                <li><a href="#" onclick="showSection('dashboard')" id="nav-dashboard" class="sidebar-link block px-6 py-3 hover:bg-slate-800 transition-colors"><i class="fa-solid fa-house w-6"></i> Dashboard</a></li>
+                <li><a href="#" onclick="showSection('module1')" id="nav-module1" class="sidebar-link block px-6 py-3 hover:bg-slate-800 transition-colors"><i class="fa-solid fa-shield-halved w-6"></i> 1. The Mindset Shift</a></li>
+                <li><a href="#" onclick="showSection('module2')" id="nav-module2" class="sidebar-link block px-6 py-3 hover:bg-slate-800 transition-colors"><i class="fa-solid fa-wand-magic-sparkles w-6"></i> 2. Prompting Mastery</a></li>
+                <li><a href="#" onclick="showSection('module3')" id="nav-module3" class="sidebar-link block px-6 py-3 hover:bg-slate-800 transition-colors"><i class="fa-regular fa-gem w-6"></i> 3. HNW Applications</a></li>
+                <li><a href="#" onclick="showSection('lab')" id="nav-lab" class="sidebar-link block px-6 py-3 hover:bg-slate-800 transition-colors"><i class="fa-solid fa-flask w-6"></i> AI Prompt Lab</a></li>
+                <li><a href="#" onclick="showSection('glossary')" id="nav-glossary" class="sidebar-link block px-6 py-3 hover:bg-slate-800 transition-colors"><i class="fa-solid fa-book w-6"></i> Glossary</a></li>
+            </ul>
+        </nav>
+
+        <div class="p-4 border-t border-slate-700">
+            <div class="bg-slate-800 rounded-lg p-4">
+                <p class="text-xs text-slate-400 mb-2">Your Progress</p>
+                <div class="w-full bg-slate-700 rounded-full h-2 mb-2">
+                    <div id="sidebar-progress-bar" class="bg-amber-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+                <p class="text-right text-xs font-bold text-amber-500" id="progress-text">0%</p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden relative">
+        
+        <!-- Mobile Header -->
+        <header class="md:hidden bg-slate-900 text-white p-4 flex justify-between items-center">
+            <span class="font-bold brand-font">Applied AI Labs</span>
+            <button onclick="toggleMobileMenu()" class="text-white"><i class="fa-solid fa-bars text-xl"></i></button>
+        </header>
+
+        <!-- Mobile Menu Overlay -->
+        <div id="mobile-menu" class="fixed inset-0 bg-slate-900 z-40 transform translate-x-full transition-transform duration-300 md:hidden flex flex-col pt-20 px-6">
+            <button onclick="toggleMobileMenu()" class="absolute top-4 right-4 text-white text-2xl"><i class="fa-solid fa-times"></i></button>
+            <a href="#" onclick="showSection('dashboard'); toggleMobileMenu()" class="py-3 text-lg border-b border-slate-700">Dashboard</a>
+            <a href="#" onclick="showSection('module1'); toggleMobileMenu()" class="py-3 text-lg border-b border-slate-700">1. The Mindset Shift</a>
+            <a href="#" onclick="showSection('module2'); toggleMobileMenu()" class="py-3 text-lg border-b border-slate-700">2. Prompting Mastery</a>
+            <a href="#" onclick="showSection('module3'); toggleMobileMenu()" class="py-3 text-lg border-b border-slate-700">3. HNW Applications</a>
+            <a href="#" onclick="showSection('lab'); toggleMobileMenu()" class="py-3 text-lg border-b border-slate-700">AI Prompt Lab</a>
+            <a href="#" onclick="showSection('glossary'); toggleMobileMenu()" class="py-3 text-lg border-b border-slate-700">Glossary</a>
+        </div>
+
+        <!-- Content Scroll Area -->
+        <div id="content-area" class="flex-1 overflow-y-auto p-6 md:p-10 scroll-smooth">
+            
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="max-w-4xl mx-auto">
+                <div class="mb-8">
+                    <span class="text-amber-600 font-semibold tracking-wide uppercase text-sm">Welcome</span>
+                    <h2 class="text-4xl md:text-5xl font-bold text-slate-900 mt-2 mb-4">The Realtor's AI Advantage</h2>
+                    <p class="text-xl text-slate-600 leading-relaxed">
+                        Designed specifically for Seattle agents servicing the luxury market. If you are skeptical, overwhelmed, or simply unsure how Artificial Intelligence fits into your high-touch business model, you are in the right place.
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6 mb-10">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xl mb-4"><i class="fa-solid fa-chess-king"></i></div>
+                        <h3 class="text-xl font-bold mb-2">Target: High Net Worth</h3>
+                        <p class="text-slate-600">AI isn't about automation for speed; it's about precision for luxury. Learn to craft bespoke experiences for clients in Medina, Hunts Point, and Madison Park.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <div class="w-12 h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-xl mb-4"><i class="fa-solid fa-handshake-simple"></i></div>
+                        <h3 class="text-xl font-bold mb-2">The Philosophy</h3>
+                        <p class="text-slate-600">We don't replace your intuition. We amplify it. This system teaches you to use AI as a junior analyst and copywriter, leaving you free to be the closer.</p>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 rounded-xl p-8 text-white text-center shadow-lg">
+                    <h3 class="text-2xl font-bold mb-4 brand-font">Ready to begin?</h3>
+                    <p class="mb-6 text-slate-300">Start by understanding why AI matters to your specific business model.</p>
+                    <button onclick="showSection('module1')" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-8 rounded-lg transition-colors">
+                        Start Module 1 <i class="fa-solid fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Module 1: The Mindset Shift -->
+            <section id="module1" class="max-w-4xl mx-auto hidden">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-12 h-12 bg-slate-200 rounded-full flex items-center justify-center text-slate-600 font-bold">01</div>
+                    <h2 class="text-3xl font-bold text-slate-900">The Mindset Shift</h2>
+                    <button id="btn-mod1" onclick="toggleComplete('module1')" class="ml-auto text-sm border border-slate-300 px-4 py-2 rounded-full hover:bg-slate-100 transition">Mark Complete</button>
+                </div>
+
+                <div class="prose max-w-none text-lg text-slate-700 space-y-6">
+                    <p>You've likely heard the hype. "AI will take your job." Let's be clear: <strong>AI will not take your job, but a Realtor using AI effectively might.</strong></p>
+                    
+                    <div class="bg-amber-50 border-l-4 border-amber-500 p-6 my-6">
+                        <h4 class="font-bold text-amber-800 mb-2">The Seattle Luxury Context</h4>
+                        <p class="text-amber-900 text-sm">Your HNW clients in Seattle expect perfection. They expect you to know micro-market trends in Queen Anne before they hit the news. They expect discretion and sophistication. AI helps you manage this information overload.</p>
+                    </div>
+
+                    <h3 class="text-2xl font-bold text-slate-900 mt-8">Addressing the Skepticism</h3>
+                    <p>It's natural to be reluctant. You built your business on relationships, shaking hands, and knowing people. A chatbot can't do that. Correct.</p>
+                    <p>But consider this: <em>How much time do you spend on low-value tasks?</em> Formatting property descriptions? Researching zoning laws for a waterfront plot? Coordinating basic showing feedback emails?</p>
+                    
+                    <h3 class="text-2xl font-bold text-slate-900 mt-8">The "Co-Pilot" Analogy</h3>
+                    <p>Think of AI not as the pilot, but as the co-pilot. You are still flying the plane and making the landing decisions. The co-pilot handles the checklists, the radio chatter, and the navigation charts so you can focus on the horizon.</p>
+
+                    <div class="mt-8 p-6 border border-slate-200 rounded-lg">
+                        <h4 class="font-bold text-slate-900 mb-4">Key Takeaways for this Module:</h4>
+                        <ul class="list-disc pl-5 space-y-2">
+                            <li>AI is a tool for leverage, not replacement.</li>
+                            <li>In luxury real estate, time is your most valuable asset.</li>
+                            <li>Using AI doesn't make you "robotic"; it frees you up to be more "human" with your clients.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Module 2: Prompting Mastery -->
+            <section id="module2" class="max-w-4xl mx-auto hidden">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-12 h-12 bg-slate-200 rounded-full flex items-center justify-center text-slate-600 font-bold">02</div>
+                    <h2 class="text-3xl font-bold text-slate-900">Prompting Mastery</h2>
+                    <button id="btn-mod2" onclick="toggleComplete('module2')" class="ml-auto text-sm border border-slate-300 px-4 py-2 rounded-full hover:bg-slate-100 transition">Mark Complete</button>
+                </div>
+
+                <p class="text-lg text-slate-700 mb-8">"Prompting" is just a fancy word for "instructing." Because AI doesn't know your context (you, the client, the neighborhood), you must provide it. The quality of the output depends entirely on the quality of your input.</p>
+
+                <h3 class="text-2xl font-bold text-slate-900 mb-6">The Good / Better / Best Framework</h3>
+                <p class="mb-6 text-slate-600">Let's look at how to ask an AI to write a listing description for a luxury waterfront home in Seattle.</p>
+
+                <!-- Example 1 -->
+                <div class="space-y-4 mb-10">
+                    <div class="bg-red-50 border border-red-100 p-6 rounded-lg relative">
+                        <div class="absolute -top-3 left-4 bg-red-200 text-red-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">Good</div>
+                        <h4 class="font-bold text-slate-800 mt-2 mb-2">The Prompt:</h4>
+                        <p class="font-mono text-sm bg-white p-3 rounded border border-red-200 text-slate-700">"Write a real estate listing for a house in Seattle."</p>
+                        <div class="mt-4 text-sm text-red-800">
+                            <strong class="block mb-1"><i class="fa-solid fa-circle-xmark"></i> Why it's weak:</strong>
+                            Too vague. "House" could be a shack. "Seattle" is huge. The AI will guess, and usually guess generic.
+                        </div>
+                    </div>
+
+                    <div class="bg-yellow-50 border border-yellow-100 p-6 rounded-lg relative">
+                        <div class="absolute -top-3 left-4 bg-yellow-200 text-yellow-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">Better</div>
+                        <h4 class="font-bold text-slate-800 mt-2 mb-2">The Prompt:</h4>
+                        <p class="font-mono text-sm bg-white p-3 rounded border border-yellow-200 text-slate-700">"Write a listing for a luxury 4-bedroom home in Madison Park. It has a view of Lake Washington and a chef's kitchen."</p>
+                        <div class="mt-4 text-sm text-yellow-800">
+                            <strong class="block mb-1"><i class="fa-solid fa-thumbs-up"></i> Why it's better:</strong>
+                            We added location (Madison Park) and specific features. It's usable, but it might sound like a brochure rather than a story.
+                        </div>
+                    </div>
+
+                    <div class="bg-green-50 border border-green-100 p-6 rounded-lg relative shadow-sm">
+                        <div class="absolute -top-3 left-4 bg-green-200 text-green-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">Best</div>
+                        <div class="flex justify-end mb-2"><button onclick="copyToClipboard(this)" data-text="Act as an expert luxury real estate copywriter. Write a compelling narrative for a 4-bedroom, 5-bath estate in Madison Park, Seattle. Focus on the emotional impact of the panoramic Lake Washington views and the privacy of the gated lot. Use sophisticated language. Target audience: High-net-worth individuals looking for a sanctuary. Tone: Serene, exclusive, elegant." class="text-xs text-green-700 hover:underline"><i class="fa-regular fa-copy"></i> Copy Prompt</button></div>
+                        <h4 class="font-bold text-slate-800 mt-2 mb-2">The Prompt:</h4>
+                        <p class="font-mono text-sm bg-white p-3 rounded border border-green-200 text-slate-700 leading-relaxed">Act as an expert luxury real estate copywriter. Write a compelling narrative for a 4-bedroom, 5-bath estate in Madison Park, Seattle. Focus on the emotional impact of the panoramic Lake Washington views and the privacy of the gated lot. Use sophisticated language. Target audience: High-net-worth individuals looking for a sanctuary. Tone: Serene, exclusive, elegant.</p>
+                        <div class="mt-4 text-sm text-green-800">
+                            <strong class="block mb-1"><i class="fa-solid fa-star"></i> Why it's best:</strong>
+                            We assigned a <strong>Role</strong> (Expert Copywriter), defined the <strong>Tone</strong>, identified the <strong>Target Audience</strong>, and specified the <strong>Emotional Hook</strong>.
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="text-2xl font-bold text-slate-900 mb-4">Core Prompting Elements</h3>
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div class="bg-white p-4 rounded-lg border shadow-sm text-center">
+                        <i class="fa-solid fa-user-tie text-3xl text-blue-500 mb-3"></i>
+                        <h4 class="font-bold">Persona</h4>
+                        <p class="text-sm text-slate-600">"Act as a legal expert..." or "Act as a marketing director..."</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg border shadow-sm text-center">
+                        <i class="fa-solid fa-bullseye text-3xl text-red-500 mb-3"></i>
+                        <h4 class="font-bold">Context</h4>
+                        <p class="text-sm text-slate-600">Give background. "The client is a tech CEO selling to move to Europe."</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg border shadow-sm text-center">
+                        <i class="fa-solid fa-sliders text-3xl text-purple-500 mb-3"></i>
+                        <h4 class="font-bold">Constraints</h4>
+                        <p class="text-sm text-slate-600">"Keep it under 200 words." "Use bullet points only."</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Module 3: HNW Applications -->
+            <section id="module3" class="max-w-4xl mx-auto hidden">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-12 h-12 bg-slate-200 rounded-full flex items-center justify-center text-slate-600 font-bold">03</div>
+                    <h2 class="text-3xl font-bold text-slate-900">HNW Applications</h2>
+                    <button id="btn-mod3" onclick="toggleComplete('module3')" class="ml-auto text-sm border border-slate-300 px-4 py-2 rounded-full hover:bg-slate-100 transition">Mark Complete</button>
+                </div>
+
+                <p class="text-lg text-slate-700 mb-8">Beyond writing emails, here are three specific ways to use AI to serve High Net Worth clients in the greater Seattle area.</p>
+
+                <!-- Use Case 1 -->
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden mb-8">
+                    <div class="bg-slate-100 p-6 border-b border-slate-200">
+                        <h3 class="text-xl font-bold text-slate-900"><i class="fa-solid fa-chart-line text-blue-600 mr-2"></i> Micro-Market Analysis</h3>
+                        <p class="text-sm text-slate-600">Don't just give them sold comps. Give them a narrative.</p>
+                    </div>
+                    <div class="p-6">
+                        <p class="mb-4 text-slate-700">AI can summarize trends from raw data. (Note: You must paste the data into the AI if it doesn't have web access, or use a tool connected to the web).</p>
+                        <div class="bg-slate-900 rounded-lg p-4 relative group">
+                            <button onclick="copyToClipboard(this)" data-text="Analyze the following real estate data for the Hunts Point area. Identify the trend for homes over 5000 sq ft priced above $5M. Provide a summary for a seller indicating if it is a buyer's or seller's market, specifically highlighting 'Days on Market' and 'Price per Sq Ft' changes over the last 6 months. [PASTE DATA HERE]" class="absolute top-2 right-2 bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-1 rounded opacity-0 group-hover:opacity-100 transition">Copy</button>
+                            <p class="text-green-400 font-mono text-sm">Analyze the following real estate data for the Hunts Point area. Identify the trend for homes over 5000 sq ft priced above $5M. Provide a summary for a seller indicating if it is a buyer's or seller's market, specifically highlighting 'Days on Market' and 'Price per Sq Ft' changes over the last 6 months. [PASTE DATA HERE]</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Use Case 2 -->
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden mb-8">
+                    <div class="bg-slate-100 p-6 border-b border-slate-200">
+                        <h3 class="text-xl font-bold text-slate-900"><i class="fa-solid fa-wine-glass text-purple-600 mr-2"></i> Bespoke Itinerary Planning</h3>
+                        <p class="text-sm text-slate-600">The "Concierge" differentiator.</p>
+                    </div>
+                    <div class="p-6">
+                        <p class="mb-4 text-slate-700">When an out-of-town buyer visits, impress them with a curated day that fits their interests.</p>
+                        <div class="bg-slate-900 rounded-lg p-4 relative group">
+                            <button onclick="copyToClipboard(this)" data-text="Plan a 1-day itinerary for a High Net Worth couple visiting Seattle for house hunting in Capitol Hill. They are interested in modern architecture, fine dining, and organic wine. They do not like tourist traps. Create a timeline from 10 AM to 8 PM including 3 property viewing windows and 2 dining recommendations." class="absolute top-2 right-2 bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-1 rounded opacity-0 group-hover:opacity-100 transition">Copy</button>
+                            <p class="text-green-400 font-mono text-sm">Plan a 1-day itinerary for a High Net Worth couple visiting Seattle for house hunting in Capitol Hill. They are interested in modern architecture, fine dining, and organic wine. They do not like tourist traps. Create a timeline from 10 AM to 8 PM including 3 property viewing windows and 2 dining recommendations.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Use Case 3 -->
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden mb-8">
+                    <div class="bg-slate-100 p-6 border-b border-slate-200">
+                        <h3 class="text-xl font-bold text-slate-900"><i class="fa-solid fa-comments text-amber-600 mr-2"></i> Difficult Conversation Prep</h3>
+                        <p class="text-sm text-slate-600">Roleplay before the real thing.</p>
+                    </div>
+                    <div class="p-6">
+                        <p class="mb-4 text-slate-700">Practice handling a client who wants to list 20% above market value.</p>
+                        <div class="bg-slate-900 rounded-lg p-4 relative group">
+                            <button onclick="copyToClipboard(this)" data-text="Act as a difficult luxury home seller. I am a real estate agent. You insist on listing your waterfront property in West Seattle for $4M, despite my advice that the market comp is $3.2M. You believe your home is unique. I need to practice explaining the risks of overpricing (stale market, low appraisals) without offending you. Let's roleplay. Start by stating your price demand." class="absolute top-2 right-2 bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-1 rounded opacity-0 group-hover:opacity-100 transition">Copy</button>
+                            <p class="text-green-400 font-mono text-sm">Act as a difficult luxury home seller. I am a real estate agent. You insist on listing your waterfront property in West Seattle for $4M, despite my advice that the market comp is $3.2M. You believe your home is unique. I need to practice explaining the risks of overpricing (stale market, low appraisals) without offending you. Let's roleplay. Start by stating your price demand.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Interactive Prompt Lab -->
+            <section id="lab" class="max-w-5xl mx-auto hidden h-full flex flex-col">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-2xl"><i class="fa-solid fa-flask"></i></div>
+                    <h2 class="text-3xl font-bold text-slate-900">AI Prompt Lab</h2>
+                </div>
+                
+                <p class="text-lg text-slate-700 mb-6">Practice your prompting skills here. This is a simulated environment. Select a preset scenario to get started, or write your own.</p>
+
+                <div class="grid lg:grid-cols-2 gap-6 flex-1 min-h-[500px]">
+                    <!-- Input Column -->
+                    <div class="flex flex-col gap-4">
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Scenario Preset</label>
+                            <select id="lab-preset" onchange="loadPreset()" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none">
+                                <option value="">-- Select a Scenario --</option>
+                                <option value="1">Luxury Listing Description (Madison Park)</option>
+                                <option value="2">Client Follow-up (After Viewing)</option>
+                                <option value="3">Investment Summary (Bellevue)</option>
+                            </select>
+                        </div>
+
+                        <div class="flex-1 bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col">
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Your Prompt</label>
+                            <textarea id="lab-input" class="flex-1 w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none resize-none font-mono text-sm" placeholder="Type your prompt here..."></textarea>
+                            <div class="mt-4 flex justify-end">
+                                <button onclick="runSimulation()" class="bg-slate-900 hover:bg-slate-800 text-white font-bold py-2 px-6 rounded-lg flex items-center gap-2">
+                                    <i class="fa-solid fa-paper-plane"></i> Generate Response
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Output Column -->
+                    <div class="flex flex-col">
+                        <div class="flex-1 bg-slate-900 text-white p-6 rounded-xl shadow-lg flex flex-col overflow-hidden">
+                            <div class="flex items-center justify-between mb-4 border-b border-slate-700 pb-2">
+                                <span class="text-xs uppercase tracking-widest text-slate-400 font-bold">AI Output Simulation</span>
+                                <div class="flex gap-2">
+                                    <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                                    <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                                    <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                                </div>
+                            </div>
+                            <div id="lab-output" class="flex-1 overflow-y-auto font-mono text-sm leading-relaxed text-slate-300">
+                                <span class="opacity-50 italic">// Output will appear here...</span>
+                            </div>
+                        </div>
+                        <p class="text-xs text-center text-slate-500 mt-3">Note: This is a simulation using pre-canned responses for demonstration purposes.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Glossary Section -->
+            <section id="glossary" class="max-w-4xl mx-auto hidden">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-12 h-12 bg-slate-200 rounded-full flex items-center justify-center text-slate-600 font-bold"><i class="fa-solid fa-book"></i></div>
+                    <h2 class="text-3xl font-bold text-slate-900">Essential AI Glossary</h2>
+                </div>
+                
+                <div class="mb-8">
+                    <input type="text" id="glossary-search" onkeyup="filterGlossary()" placeholder="Search terms..." class="w-full p-4 border border-slate-300 rounded-lg shadow-sm focus:ring-2 focus:ring-amber-500 outline-none">
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-4" id="glossary-grid">
+                    <!-- Terms injected via JS -->
+                </div>
+            </section>
+
+        </div>
+
+        <!-- Footer -->
+        <footer class="bg-white border-t border-slate-200 p-4 text-center text-sm text-slate-500">
+            <a href="https://www.appliedailabs.com" target="_blank" class="hover:text-amber-600 transition">Applied AI Labs</a> &copy; 2025. All rights reserved.
+        </footer>
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">Action Successful</div>
+
+    <script>
+        // --- Data & State Management ---
+
+        const glossaryTerms = [
+            { term: "Algorithm", def: "A set of rules given to an AI to help it learn on its own or solve a problem." },
+            { term: "Chatbot", def: "A computer program that simulates human conversation through voice or text." },
+            { term: "Context Window", def: "The amount of text information an AI model can consider at one time." },
+            { term: "Deep Learning", def: "A type of machine learning based on artificial neural networks." },
+            { term: "Fine-Tuning", def: "The process of taking a pre-trained AI model and training it further on a specific dataset." },
+            { term: "Generative AI", def: "AI that creates new content (text, images, audio) rather than just analyzing existing data." },
+            { term: "Hallucination", def: "When an AI generates false or misleading information confidently." },
+            { term: "Inference", def: "The process of using a trained AI model to make predictions or generate output." },
+            { term: "Large Language Model (LLM)", def: "A deep learning algorithm that can perform a variety of natural language processing tasks." },
+            { term: "Machine Learning (ML)", def: "A subset of AI where computers learn from data without being explicitly programmed." },
+            { term: "Natural Language Processing (NLP)", def: "The branch of AI concerned with giving computers the ability to understand text and spoken words." },
+            { term: "Neural Network", def: "A method in AI that teaches computers to process data in a way that is inspired by the human brain." },
+            { term: "Parameters", def: "The internal variables of an AI model that are adjusted during training." },
+            { term: "Prompt", def: "The input or instruction given by a human to an AI model to generate a response." },
+            { term: "Prompt Engineering", def: "The art of crafting inputs to get the best possible output from an AI." },
+            { term: "Reinforcement Learning", def: "A type of machine learning where an agent learns to make decisions by performing actions and receiving rewards." },
+            { term: "Semantic Search", def: "Search that understands the meaning and intent behind the words, not just matching keywords." },
+            { term: "Sentiment Analysis", def: "The process of determining the emotional tone behind words to gain understanding of opinions." },
+            { term: "Token", def: "The basic unit of text or code that an AI model processes." },
+            { term: "Zero-Shot Prompting", def: "Asking an AI to perform a task without providing any examples of how to do it." }
+        ];
+
+        const presets = {
+            '1': "Write a listing description for a $3.5M home in Madison Park. 4 bed, 3.5 bath. Key feature: A private dock on Lake Washington. Tone: Exclusive and inviting.",
+            '2': "Write a follow-up email to Mr. Henderson who viewed the penthouse at the Four Seasons Private Residences today. He seemed concerned about the parking situation. Be empathetic but professional.",
+            '3': "Summarize the investment potential of a duplex in Bellevue's downtown corridor near the new light rail station. Focus on appreciation potential and rental yield."
+        };
+
+        // Simulation Responses
+        const mockResponses = {
+            'default': "I understand your request. Based on the parameters provided, here is a draft designed for your target audience. \n\n[Simulated AI Content generated here...]\n\nDoes this align with your expectations, or would you like me to adjust the tone?",
+            'listing': "Exquisite lakefront living awaits in this prestigious Madison Park estate. Boasting 4 spacious bedrooms and 3.5 opulent baths, this $3.5M sanctuary is the epitome of Pacific Northwest luxury. The crowning jewel is your private dock, offering immediate access to the shimmering waters of Lake Washington. Inside, sophisticated finishes and abundant natural light create an atmosphere of serene exclusivity. This is more than a home; it is a lifestyle.",
+            'email': "Dear Mr. Henderson,\n\nThank you for joining me today to view the penthouse at the Four Seasons. It was a pleasure exploring the property with you.\n\nI completely understand your thoughts regarding the parking arrangements. Secure, convenient vehicle storage is paramount, especially for a residence of this caliber. I've attached the detailed HOA documentation regarding the deeded parking spaces and the valet services available. I'd be happy to discuss this further or arrange a follow-up with the building manager.\n\nBest regards,\n[Your Name]",
+            'investment': "Investment Summary: Bellevue Downtown Duplex\n\n\n**Appreciation Potential:** High. The proximity to the upcoming light rail station significantly boosts long-term value, attracting commuters and tech workers.\n\n\n**Rental Yield:** Strong. Given the limited supply of multi-family housing in this specific corridor, demand remains consistently high, allowing for competitive premium rent.\n\n\n**Verdict:** A solid 'Buy' for long-term hold strategies."
+        };
+
+        let userState = {
+            completedModules: []
+        };
+
+        // --- Initialization ---
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProgress();
+            renderGlossary();
+            updateProgressUI();
+            // Start at dashboard
+            showSection('dashboard');
+        });
+
+        // --- Navigation & UI Logic ---
+
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('main section').forEach(sec => {
+                sec.classList.add('hidden');
+            });
+            // Show target
+            document.getElementById(sectionId).classList.remove('hidden');
+
+            // Update sidebar active state
+            document.querySelectorAll('.sidebar-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            const activeLink = document.getElementById('nav-' + sectionId);
+            if(activeLink) activeLink.classList.add('active');
+
+            // Scroll to top
+            document.getElementById('content-area').scrollTop = 0;
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            if (menu.classList.contains('translate-x-full')) {
+                menu.classList.remove('translate-x-full');
+            } else {
+                menu.classList.add('translate-x-full');
+            }
+        }
+
+        // --- Progress & Storage ---
+
+        function loadProgress() {
+            const stored = localStorage.getItem('realtor_ai_progress');
+            if (stored) {
+                userState = JSON.parse(stored);
+                // Restore UI buttons
+                userState.completedModules.forEach(mod => {
+                    const btn = document.getElementById('btn-' + mod);
+                    if(btn) updateButtonState(btn, true);
+                });
+            }
+        }
+
+        function saveProgress() {
+            localStorage.setItem('realtor_ai_progress', JSON.stringify(userState));
+            updateProgressUI();
+        }
+
+        function toggleComplete(moduleId) {
+            const btn = document.getElementById('btn-' + moduleId);
+            const index = userState.completedModules.indexOf(moduleId);
+            
+            if (index > -1) {
+                // Remove
+                userState.completedModules.splice(index, 1);
+                updateButtonState(btn, false);
+                showToast("Progress updated");
+            } else {
+                // Add
+                userState.completedModules.push(moduleId);
+                updateButtonState(btn, true);
+                showToast("Module Completed!");
+            }
+            saveProgress();
+        }
+
+        function updateButtonState(btn, isComplete) {
+            if (isComplete) {
+                btn.classList.remove('border-slate-300', 'text-slate-600');
+                btn.classList.add('bg-green-100', 'text-green-700', 'border-green-300', 'font-bold');
+                btn.innerHTML = '<i class="fa-solid fa-check mr-1"></i> Completed';
+            } else {
+                btn.classList.add('border-slate-300', 'text-slate-600');
+                btn.classList.remove('bg-green-100', 'text-green-700', 'border-green-300', 'font-bold');
+                btn.innerHTML = 'Mark Complete';
+            }
+        }
+
+        function updateProgressUI() {
+            // 3 main modules + lab (optional) -> let's say 3 modules = 100% for now
+            const totalModules = 3;
+            const completed = userState.completedModules.length;
+            const percentage = Math.round((completed / totalModules) * 100);
+            
+            document.getElementById('sidebar-progress-bar').style.width = percentage + '%';
+            document.getElementById('progress-text').innerText = percentage + '%';
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.innerText = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        function copyToClipboard(btn) {
+            const text = btn.getAttribute('data-text');
+            navigator.clipboard.writeText(text).then(() => {
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> Copied';
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                }, 2000);
+            });
+        }
+
+        // --- Glossary Logic ---
+
+        function renderGlossary() {
+            const grid = document.getElementById('glossary-grid');
+            grid.innerHTML = '';
+            glossaryTerms.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'glossary-item bg-white p-5 rounded-lg border border-slate-200 shadow-sm hover:shadow-md transition';
+                card.innerHTML = `
+                    <h4 class="font-bold text-slate-900 mb-2">${item.term}</h4>
+                    <p class="text-sm text-slate-600">${item.def}</p>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function filterGlossary() {
+            const input = document.getElementById('glossary-search').value.toLowerCase();
+            const items = document.getElementsByClassName('glossary-item');
+            
+            Array.from(items).forEach(item => {
+                const term = item.querySelector('h4').innerText.toLowerCase();
+                const def = item.querySelector('p').innerText.toLowerCase();
+                if(term.includes(input) || def.includes(input)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // --- Lab Simulation Logic ---
+
+        function loadPreset() {
+            const val = document.getElementById('lab-preset').value;
+            const textarea = document.getElementById('lab-input');
+            if(presets[val]) {
+                textarea.value = presets[val];
+            }
+        }
+
+        function runSimulation() {
+            const input = document.getElementById('lab-input').value;
+            const outputDiv = document.getElementById('lab-output');
+            
+            if(!input.trim()) {
+                showToast("Please enter a prompt first");
+                return;
+            }
+
+            outputDiv.innerHTML = '<span class="typing-cursor">Analyzing...</span>';
+
+            // Simulate processing delay
+            setTimeout(() => {
+                // Determine which mock response to use based on keywords
+                let responseText = mockResponses['default'];
+                const lowerInput = input.toLowerCase();
+
+                if(lowerInput.includes('listing') || lowerInput.includes('madison park')) {
+                    responseText = mockResponses['listing'];
+                } else if(lowerInput.includes('email') || lowerInput.includes('henderson') || lowerInput.includes('follow')) {
+                    responseText = mockResponses['email'];
+                } else if(lowerInput.includes('investment') || lowerInput.includes('duplex') || lowerInput.includes('bellevue')) {
+                    responseText = mockResponses['investment'];
+                }
+
+                // Typewriter effect
+                outputDiv.innerHTML = '';
+                let i = 0;
+                const speed = 15; // ms per char
+
+                function typeWriter() {
+                    if (i < responseText.length) {
+                        outputDiv.innerHTML += responseText.charAt(i);
+                        outputDiv.scrollTop = outputDiv.scrollHeight; // Auto scroll
+                        i++;
+                        setTimeout(typeWriter, speed);
+                    } else {
+                        outputDiv.innerHTML = responseText; // Remove cursor if needed or keep it
+                    }
+                }
+                typeWriter();
+
+            }, 1500);
+        }
+
+    </script>
+</body>
+</html>
