@@ -619,8 +619,11 @@ const App = {
             const isCompleted = this.state.completedModules.includes(mod.id);
             const icon = isCompleted ? '✓' : (index + 1);
             
+            // Extract friendly name from title (everything after the colon, or the whole title if no colon)
+            const friendlyName = mod.title.includes(':') ? mod.title.split(': ')[1] : mod.title;
+            
             li.innerHTML = `
-                <span>Module ${index + 1}</span>
+                <span>${friendlyName}</span>
                 <span class="status-icon">${icon}</span>
             `;
             li.onclick = () => {
